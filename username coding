@@ -1,22 +1,112 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#define SIZE 1
+struct konuinfo{
+    int votenum;
+    char issue[50][50];
+};
+struct infos{
+    char username[20];
+    char password[20];
+    char name[20];
+    char surname[20];
+    char vote[50][20];
+    int votecontrol[50];
+};
 
-int main(void)
-{
-    char username[10];
-    char password[10];
-
-    printf("Enter your username: ");
-    scanf("%s", username);
-
-    printf("Enter your password: ");
-    scanf("%s", password);
-
-    if (strcmp(username, "doruk") == 0 && strcmp(password, "doruk28") == 0
-        || strcmp(username, "anaxi") == 0 && strcmp(password, "2881") == 0
-        || strcmp(username, "jules") == 0 && strcmp(password, "2234") == 0) {
-            printf("Logged In Successfully");
-    } else {
-        printf("Incorrect username or password, please try again! ");
+int main(){
+    struct infos user[SIZE];
+    struct konuinfo konu;
+    int i;
+    printf("Hello, please follow the steps.\n");
+    printf("You are going to create users.\n");
+    for(i = 0; i < SIZE;i++){
+        printf("\nEnter name and surname: ");
+        scanf("%s %s", user[i].name, user[i].surname);
+        printf("\n Enter a id to create: ");
+        scanf("%s", user[i].username);
+        printf("\n Enter a password to create: ");
+        scanf("%s", user[i].password);
     }
+    printf("Account creation is complete.\n");
+    login:
+    printf("Enter a ID and password to log in: ");
+    char *id = (char*)malloc(20* sizeof(char));
+    char *password = (char*)malloc(20* sizeof(char));
+    int index = 0, last_issue_index = 0;
+    scanf("%s %s", id, password);
+    for(i = 0; i < SIZE;i++){
+        if( ( !(strcmp(id, user[i].username)) ) && ( !(strcmp(password, user[i].password)) ) ){
+            index = i;
+            break;
+        }
+        else if(i == SIZE - 1){
+            i = 0;
+            printf("Wrong id or password. Try again.\n");
+            printf("Enter ID and Password: ");
+            scanf("%s %s", id, password);
+        }
+    }
+    printf("Hey %s %s, can you choose the action you want to do?", user[index].name, user[index].surname);
+    printf("\n1 - I want to change my password..\n2 - I want to determine a topic and submit it to the vote.\n3 - I want to change a vote for a current topic.\n4 - I want to log out of my account.\n");
+    int menucontrol, issuecontrol, issuenum;
+    scanf("%d", &menucontrol);
+    char *issue = (char*)malloc(50 * sizeof(char));
+    while(menucontrol != 4){
+        if(menucontrol == 1){
+            printf("\nPlease enter your current password: ");
+            scanf("%s", password);
+            while(strcmp(password, user[index].password)){
+                printf("\nYou have entered your current password incorrectly, can you re-enter it:");
+                scanf("%s", password);
+            }
+            printf("\nPlease enter your new password: ");
+            scanf("%s", user[index].password);
+            printf("Password changed as %s\n", user[index].password);
+        }
+        else if(menucontrol == 2){
+                    printf("Enter a new issue: \n");   
+                    last_issue_index++;
+                    scanf("%s", konu.issue[last_issue_index - 1]);
+                    printf("New issue is created as %s.\n", konu.issue[last_issue_index - 1]); 
+                    for(i = 0; i < SIZE;i++){
+                        printf("%s %s's turn to vote, please enter your vote('YES' or 'NO' or 'abstain'): ", user[i].name, user[i].surname);
+                        scanf("%s", user[i].vote[last_issue_index-1]);
+                        user[i].votecontrol[last_issue_index - 1] = 1;
+                    
+                }  
+                printf("Votes are saved\n"); 
+        }
+        else if(menucontrol == 3){
+            if(last_issue_index == 0)
+                printf("There is no issue yet.\n");
+            else{
+                printf("Which issue you want to change your vote:\n");
+                for(i = 0; i < last_issue_index;i++){
+                    printf("%d - %s\n", i+1, konu.issue[i]);
+                }
+                scanf("%d", &issuenum);
+                printf("Enter your vote('YES' or 'NO' or 'abstain'): ");
+                scanf("%s", user[index].vote[issuenum - 1]);
+                user[index].votecontrol[issuenum] = 1;
+            }
+        }
+        else if(menucontrol == 4){
+            printf("Successfully signed out of your account.\n");
+            printf("Names of did not vote to some issues:\n ");
+            for(i = 0; i < SIZE;i++){
+                if(user[i].votecontrol != 1)
+                    printf("%s %s\n", user[i].name, user[i].surname);
+            }
+            goto login;
+            index = 0;
+        }
+         printf("\n1 - I want to change my password..\n2 - I want to determine a topic and submit it to the vote.\n3 - I want to change a vote for a current topic.\n4 - I want to log out of my account.\n");
+         scanf("%d", &menucontrol);
+    }
+    free(id);
+    free(password);
+    free(issue);
+    return 0;
 }
